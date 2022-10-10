@@ -7,9 +7,10 @@ const { isValidMail, isValid, isValidName, isValidRequestBody, isValidfild, isVa
 
 
 
+
 const createUser = async function (req, res) {
     try {
-        const address = req.body.address
+        let address = req.body.address
         let data = req.body
         let { fname, lname, email, phone, password } = data
         if (!isValidRequestBody(data)) { return res.status(400).send({ status: false, message: "body cant't be empty Please enter some data." }) }
@@ -25,12 +26,13 @@ const createUser = async function (req, res) {
         if (duplicateEmail) { return res.status(400).send({ status: false, message: `${email} email is aleardy exist` }) }
 
         let files = req.files
+        let uploadedFileURL
         // if(!files) {return res.status(400).send({status: false, message: "profileImage is required"})}
         if (files && files.length > 0) {
             //upload to s3 and get the uploaded link
             // res.send the link back to frontend/postman
-            let uploadedFileURL = await aws.uploadFile(files[0])
-            res.status(201).send({ msg: "file uploaded succesfully", data: uploadedFileURL })
+            uploadedFileURL = await aws.uploadFile(files[0])
+            // res.status(201).send({ msg: "file uploaded succesfully", data: uploadedFileURL })
         }
         else {
             res.status(400).send({ msg: "Please add profile image" })
@@ -44,9 +46,12 @@ const createUser = async function (req, res) {
         let duplicatePhone = await userModel.findOne({ phone })
         if (duplicatePhone) { return res.status(400).send({ status: false, message: `${phone} phone no is aleardy registered` }) }
 
+        if (!isValid(password)) { return res.status(400).send({ status: false, message: "lname is required" }) }
         if (!isValidPassword(password)) return res.status(406).send({ status: false, message: "enter valid password  ", ValidPassWord: "passWord in between(8-15)& must be contain ==> upperCase,lowerCase,specialCharecter & Number" })
 
         if (!isValid(address)) { return res.status(400).send({ status: false, message: "address is required" }) }
+
+        address = JSON.parse(address)
 
         if (!isValid(address.shipping)) { return res.status(400).send({ status: false, message: "please enter your shipping address" }) }
 
@@ -58,7 +63,7 @@ const createUser = async function (req, res) {
 
         if (address.shipping.pincode) {
 
-            if (!(/^[1-9][0-9]{5}$/).test(address.pincode)) return res.status(400).send({ status: false, message: "please enter valied pincode " })
+            if (!/^[1-9][0-9]{5}$/.test(address.shipping.pincode)) return res.status(400).send({ status: false, message: "please enter valid pincode " })
         }
 
         if (!isValid(address.billing)) { return res.status(400).send({ status: false, message: "please enter your billing address" }) }
@@ -96,20 +101,15 @@ const login = async function (req, res) {
         let data = req.body
         let save = req.params
 
-        if (object.keys(save).length > 0) {
-            return res.status(400).send({ status: false, message: "this is not valid place for input" })
-        }
+        if (!isValidRequestBody(data)) { return res.status(400).send({ status: false, message: "body cant't be empty Please enter some data." }) }
 
-        if (Object.keys(data).length == 0 && Object.keys(data).length > 2) {
-            return res.status(400).send({ status: false, message: "this is not valid request" })
-
-        }
         const { email, password } = data
-        if (!email) { return res.status(404).send({ status: false, message: "email is mandatory" }) }
+        if (!isValid(email)) { return res.status(400).send({ status: false, message: "email is required" }) }
+        if (!isValidMail.test(email)) { return res.status(400).send({ status: false, message: "please enter email in valid format" }) }
 
-        if (!password) {
-            return res.status(404).send({ status: false, message: "password is mandatory" })
-        }
+        if (!isValid(password)) { return res.status(400).send({ status: false, message: "lname is required" }) }
+        if (!isValidPassword(password)) return res.status(406).send({ status: false, message: "enter valid password  ", ValidPassWord: "passWord in between(8-15)& must be contain ==> upperCase,lowerCase,specialCharecter & Number" })
+
 
         const loginUser = await userModel.findOne({ email: email, password: password })
         if (!loginUser) {
