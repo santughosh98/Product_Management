@@ -5,42 +5,50 @@ const userSchema = new mongoose.Schema({
 
     fname: {
         type: String,
-         required: true
-        },
+        required: true,
+        trim: true
+    },
     lname: {
         type: String,
-        required: true 
+        required: true,
+        trim: true
     },
     email: {
-        type: string, 
+        type: String,
         required: true,
-         unique: true
-        },
+        unique: true,
+        trim: true
+    },
     profileImage: {
         type: String,
-        required: true 
+        required: true,
+        trim: true
     }, // s3 link
     phone: {
-        type: String, 
+        type: String,
         required: true,
-         unique: true, 
-    }, 
+        unique: true,
+        trim: true
+    },
     password: {
         type: String,
         required: true,
+        trim: true
     }, // encrypted password
     address: {
-      shipping: {
-        street: {type: String, required: true},
-        city: {type: String, require: true},
-        pincode: {type: Number, required: true}
-      },
-      billing: {
-        street: {type: String, required: true},
-        city: {type: String, required: true},
-        pincode: {type: Number, required: true}
-      }
-    }}, { timestamps: true })
+        shipping: {
+            street: { type: String, required: true, trim: true },
+            city: { type: String, require: true, trim: true },
+            pincode: { type: Number, required: true, trim: true }
+        },
+        billing: {
+            street: { type: String, required: true, trim: true },
+            city: { type: String, required: true, trim: true },
+            pincode: { type: Number, required: true, trim: true }
+        },
+    },
+
+}, { timestamps: true })
 
 
-    module.exports = mongoose.model('User', userSchema) 
+module.exports = mongoose.model('User', userSchema) 
