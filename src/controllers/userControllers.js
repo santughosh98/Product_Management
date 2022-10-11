@@ -1,24 +1,23 @@
 const userModel = require("../models/userModels")
 const jwt = require("jsonwebtoken")
 const aws = require("../aws/s3")
+const bcrypt = require("bcrypt")
 
 
 const { isValidMail, isValid, isValidName, isValidRequestBody, isValidfild, isValidMobile, isValidPassword } = require("../validator/validation")
 
 
 
-
 const createUser = async function (req, res) {
     try {
-        let address = req.body.address
         let data = req.body
-        let { fname, lname, email, phone, password } = data
+        let { fname, lname, email, phone, password, address } = data
         if (!isValidRequestBody(data)) { return res.status(400).send({ status: false, message: "body cant't be empty Please enter some data." }) }
         if (!isValid(fname)) { return res.status(400).send({ status: false, message: "fname is required" }) }
-        if (!isValidName.test(fname)) { return res.status(400).send({ status: false, message: "please enter valid fname" }) }
+        if (!isValidName.test(fname)) { return res.status(400).send({ status: false, message: `${fname}please enter valid fname` }) }
 
         if (!isValid(lname)) { return res.status(400).send({ status: false, message: "lname is required" }) }
-        if (!isValidName.test(lname)) { return res.status(400).send({ status: false, message: "please enter valid lname" }) }
+        if (!isValidName.test(lname)) { return res.status(400).send({ status: false, message: `${lname}please enter valid lname` }) }
 
         if (!isValid(email)) { return res.status(400).send({ status: false, message: "email is required" }) }
         if (!isValidMail.test(email)) { return res.status(400).send({ status: false, message: "please enter email in valid format" }) }
@@ -27,26 +26,21 @@ const createUser = async function (req, res) {
 
         let files = req.files
         let uploadedFileURL
-        // if(!files) {return res.status(400).send({status: false, message: "profileImage is required"})}
         if (files && files.length > 0) {
             //upload to s3 and get the uploaded link
             // res.send the link back to frontend/postman
             uploadedFileURL = await aws.uploadFile(files[0])
-            // res.status(201).send({ msg: "file uploaded succesfully", data: uploadedFileURL })
-        }
-        else {
-            res.status(400).send({ msg: "Please add profile image" })
         }
 
         let profileImage = uploadedFileURL
-
+        if (!isValid(profileImage)) { return res.status(400).send({ status: false, message: "profileImage is required" }) }
 
         if (!isValid(phone)) { return res.status(400).send({ status: false, message: "phone is required" }) }
         if (!isValidMobile.test(phone)) { return res.status(400).send({ status: false, message: "please enter phone in valid format" }) }
         let duplicatePhone = await userModel.findOne({ phone })
         if (duplicatePhone) { return res.status(400).send({ status: false, message: `${phone} phone no is aleardy registered` }) }
 
-        if (!isValid(password)) { return res.status(400).send({ status: false, message: "lname is required" }) }
+        if (!isValid(password)) { return res.status(400).send({ status: false, message: "password is required" }) }
         if (!isValidPassword(password)) return res.status(406).send({ status: false, message: "enter valid password  ", ValidPassWord: "passWord in between(8-15)& must be contain ==> upperCase,lowerCase,specialCharecter & Number" })
 
         if (!isValid(address)) { return res.status(400).send({ status: false, message: "address is required" }) }
@@ -79,6 +73,9 @@ const createUser = async function (req, res) {
             if (!(/^[1-9][0-9]{5}$/).test(address.billing.pincode)) return res.status(400).send({ status: false, message: "please enter valied pincode " })
         }
 
+        const salt = await bcrypt.genSalt(10)
+        password = await bcrypt.hash(password, salt)
+
         let users = { fname, lname, email, profileImage, phone, password, address }
 
         const userCreation = await userModel.create(users)
@@ -94,12 +91,9 @@ const createUser = async function (req, res) {
 
 
 
-
-
 const login = async function (req, res) {
     try {
         let data = req.body
-        let save = req.params
 
         if (!isValidRequestBody(data)) { return res.status(400).send({ status: false, message: "body cant't be empty Please enter some data." }) }
 
@@ -107,14 +101,19 @@ const login = async function (req, res) {
         if (!isValid(email)) { return res.status(400).send({ status: false, message: "email is required" }) }
         if (!isValidMail.test(email)) { return res.status(400).send({ status: false, message: "please enter email in valid format" }) }
 
-        if (!isValid(password)) { return res.status(400).send({ status: false, message: "lname is required" }) }
+        if (!isValid(password)) { return res.status(400).send({ status: false, message: "password is required" }) }
         if (!isValidPassword(password)) return res.status(406).send({ status: false, message: "enter valid password  ", ValidPassWord: "passWord in between(8-15)& must be contain ==> upperCase,lowerCase,specialCharecter & Number" })
 
 
-        const loginUser = await userModel.findOne({ email: email, password: password })
+        const loginUser = await userModel.findOne({ email: email })
         if (!loginUser) {
             return res.status(400).send({ status: false, message: "Email or Password is incorrect.Please recheck it" })
         }
+
+        let passwordCheck = await bcrypt.compare(password, loginUser.password)
+        //request body password and bcrypt hash password not match
+        if (!passwordCheck) return res.status(400).send({ status: false, message: "password is not correct!" })
+
         let token = await jwt.sign({ id: loginUser._id.toString() }, "functionupiswaywaycoolproject5group9", { expiresIn: '2hr' })
         res.header({ "x-api-key": token })
         return res.status(201).send({ status: true, message: "login Successful", data: { token: token, userId: loginUser._id } })

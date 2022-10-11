@@ -20,7 +20,7 @@ const isValidRequestBody = (value) => {
 const isValidMobile = /^[6-9]{1}[0-9]{9}$/;
 
 const isValidPassword = function (value) {
-    if (/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,15}$/.test(value)) return true;
+    if (/^[\s]*[0-9a-zA-Z@#$%^&]{8,15}[\s]*$/.test(value)) return true;              //(/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-])
     return false;
 };
 
