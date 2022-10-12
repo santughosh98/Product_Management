@@ -106,12 +106,12 @@ const login = async function (req, res) {
         if (!isValidMail.test(email)) { return res.status(400).send({ status: false, message: "please enter email in valid format" }) }
 
         if (!isValid(password)) { return res.status(400).send({ status: false, message: "password is required" }) }
-        if (!isValidPassword(password)) return res.status(406).send({ status: false, message: "enter valid password  ", ValidPassWord: "passWord in between(8-15)& must be contain ==> upperCase,lowerCase,specialCharecter & Number" })
+        if (!isValidPassword(password)) return res.status(400).send({ status: false, message: "enter valid password  ", ValidPassWord: "passWord in between(8-15)& must be contain ==> upperCase,lowerCase,specialCharecter & Number" })
 
 
         const loginUser = await userModel.findOne({ email: email })
         if (!loginUser) {
-            return res.status(400).send({ status: false, message: "Email or Password is incorrect.Please recheck it" })
+            return res.status(400).send({ status: false, message: "Email is incorrect.Please recheck it" })
         }
 
         let passwordCheck = await bcrypt.compare(password, loginUser.password)
@@ -143,7 +143,7 @@ const getUserDetails = async function (req, res) {
         res.status(200).send({ status: true, message: "User profile details", data: findUserId })
 
     } catch (error) {
-
+        return res.status(500).send({ status: false, message: error.message });
     }
 }
 
@@ -169,17 +169,26 @@ const updateduser = async function (req, res) {
         if (!isValidRequestBody(data)) {
             return res.status(400).send({ status: false, meassage: "body cant't be empty Please enter some data." })
         }
-        if (!isValid(fname)) { return res.status(400).send({ status: false, message: "fname is required for update" }) }
-        if (!isValidName.test(fname)) { return res.status(400).send({ status: false, message: `${fname}please enter valid fname` }) }
 
-        if (!isValid(lname)) { return res.status(400).send({ status: false, message: "lname is required for update" }) }
-        if (!isValidName.test(lname)) { return res.status(400).send({ status: false, message: `${lname}please enter valid lname` }) }
+        if (!(fname || lname || email || profileImage || phone || password || address)) {
+            return res.status(400).send({ status: false, message: "please input a valid params" })
+        }
+        if (fname) {
+            if (!isValid(fname)) { return res.status(400).send({ status: false, message: "fname is required for update" }) }
+            if (!isValidName.test(fname)) { return res.status(400).send({ status: false, message: `${fname}please enter valid fname` }) }
+        }
 
-        if (!isValid(email)) { return res.status(400).send({ status: false, message: "email is required for update" }) }
-        if (!isValidMail.test(email)) { return res.status(400).send({ status: false, message: "please enter email in valid format" }) }
-        let duplicateEmail = await userModel.findOne({ email })
-        if (duplicateEmail) { return res.status(404).send({ status: false, message: `${email} email is aleardy exist` }) }
+        if (lname) {
+            if (!isValid(lname)) { return res.status(400).send({ status: false, message: "lname is required for update" }) }
+            if (!isValidName.test(lname)) { return res.status(400).send({ status: false, message: `${lname}please enter valid lname` }) }
+        }
 
+        if (email) {
+            if (!isValid(email)) { return res.status(400).send({ status: false, message: "email is required for update" }) }
+            if (!isValidMail.test(email)) { return res.status(400).send({ status: false, message: "please enter email in valid format" }) }
+            let duplicateEmail = await userModel.findOne({ email })
+            if (duplicateEmail) { return res.status(404).send({ status: false, message: `${email} email is aleardy exist` }) }
+        }
         let files = req.files
         let uploadedFileURL
         if (files && files.length > 0) {
@@ -189,48 +198,65 @@ const updateduser = async function (req, res) {
         }
 
         profileImage = uploadedFileURL
-        if (!isValid(profileImage)) { return res.status(400).send({ status: false, message: "profileImage is required for update" }) }
+        // if (!isValid(profileImage)) { return res.status(400).send({ status: false, message: "profileImage is required for update" }) }
 
-        if (!isValid(phone)) { return res.status(400).send({ status: false, message: "phone is required for update" }) }
-        if (!isValidMobile.test(phone)) { return res.status(400).send({ status: false, message: "please enter phone in valid format" }) }
-        let duplicatePhone = await userModel.findOne({ phone })
-        if (duplicatePhone) { return res.status(404).send({ status: false, message: `${phone} phone no is aleardy registered` }) }
-
-        if (!isValid(password)) { return res.status(400).send({ status: false, message: "password is required for update" }) }
-        if (!isValidPassword(password)) return res.status(406).send({ status: false, message: "enter valid password  ", ValidPassWord: "passWord in between(8-15)& must be contain ==> upperCase,lowerCase,specialCharecter & Number" })
-
-        if (!isValid(address)) { return res.status(400).send({ status: false, message: "address is required for update" }) }
-
-        address = JSON.parse(address)
-
-        if (!isValid(address.shipping)) { return res.status(400).send({ status: false, message: "please enter your shipping address for update" }) }
-
-        if (!isValid(address.shipping.street)) { return res.status(400).send({ status: false, message: "please enter your shipping street for update" }) }
-
-        if (!isValid(address.shipping.city)) { return res.status(400).send({ status: false, message: "please enter your shipping city for update" }) }
-
-        if (!isValid(address.shipping.pincode)) { return res.status(400).send({ status: false, message: "please enter your shipping pincode for update" }) }
-
-        if (address.shipping.pincode) {
-
-            if (!/^[1-9][0-9]{5}$/.test(address.shipping.pincode)) return res.status(400).send({ status: false, message: "please enter valid pincode for update" })
+        if (phone) {
+            if (!isValid(phone)) { return res.status(400).send({ status: false, message: "phone is required for update" }) }
+            if (!isValidMobile.test(phone)) { return res.status(400).send({ status: false, message: "please enter phone in valid format" }) }
+            let duplicatePhone = await userModel.findOne({ phone })
+            if (duplicatePhone) { return res.status(404).send({ status: false, message: `${phone} phone no is aleardy registered` }) }
         }
 
-        if (!isValid(address.billing)) { return res.status(400).send({ status: false, message: "please enter your billing address for update" }) }
+        if (password) {
+            if (!isValid(password)) { return res.status(400).send({ status: false, message: "password is required for update" }) }
+            if (password === null) { return res.status(400).send({ status: false, message: "password " }) }
 
-        if (!isValid(address.billing.street)) { return res.status(400).send({ status: false, message: "please enter your billing street for update" }) }
-
-        if (!isValid(address.billing.city)) { return res.status(400).send({ status: false, message: "please enter your billing city for update" }) }
-
-        if (!isValid(address.billing.pincode)) { return res.status(400).send({ status: false, message: "please enter your shipping pincode for update" }) }
-
-        if (address.billing.pincode) {
-
-            if (!(/^[1-9][0-9]{5}$/).test(address.billing.pincode)) return res.status(400).send({ status: false, message: "please enter valied pincode for update" })
+            if (!isValidPassword(password)) return res.status(406).send({ status: false, message: "enter valid password  ", ValidPassWord: "passWord in between(8-15)& must be contain ==> upperCase,lowerCase,specialCharecter & Number" })
+            const salt = await bcrypt.genSalt(10)
+            password = await bcrypt.hash(password, salt)
         }
 
-        const salt = await bcrypt.genSalt(10)
-        password = await bcrypt.hash(password, salt)
+        if (address) {
+            if (!isValid(address)) { return res.status(400).send({ status: false, message: "address is required for update" }) }
+
+            address = JSON.parse(address)
+
+            if (address.shipping) {
+
+                if (!isValid(address.shipping)) { return res.status(400).send({ status: false, message: "please enter your shipping address for update" }) }
+
+                if (!isValid(address.shipping.street)) { return res.status(400).send({ status: false, message: "please enter your shipping street for update" }) }
+
+                if (!isValid(address.shipping.city)) { return res.status(400).send({ status: false, message: "please enter your shipping city for update" }) }
+
+                if (!isValid(address.shipping.pincode)) { return res.status(400).send({ status: false, message: "please enter your shipping pincode for update" }) }
+
+                if (address.shipping.pincode) {
+
+                    if (!/^[1-9][0-9]{5}$/.test(address.shipping.pincode)) return res.status(400).send({ status: false, message: "please enter valid pincode for update" })
+                }
+            }
+
+
+
+            if (address.billing) {
+
+                if (!isValid(address.billing)) { return res.status(400).send({ status: false, message: "please enter your billing address for update" }) }
+
+                if (!isValid(address.billing.street)) { return res.status(400).send({ status: false, message: "please enter your billing street for update" }) }
+
+                if (!isValid(address.billing.city)) { return res.status(400).send({ status: false, message: "please enter your billing city for update" }) }
+
+                if (!isValid(address.billing.pincode)) { return res.status(400).send({ status: false, message: "please enter your shipping pincode for update" }) }
+
+                if (address.billing.pincode) {
+
+                    if (!(/^[1-9][0-9]{5}$/).test(address.billing.pincode)) return res.status(400).send({ status: false, message: "please enter valied pincode for update" })
+                }
+            }
+        }
+
+
 
 
         let updateduser = await userModel.findOneAndUpdate({ _id: userId }, {
@@ -245,8 +271,8 @@ const updateduser = async function (req, res) {
             },
         }, { new: true })
 
-
         return res.status(200).send({ status: true, message: "User profile updated sucessfully", data: updateduser })
+
     } catch (error) {
         return res.status(500).send({ status: false, message: error.message });
     }
