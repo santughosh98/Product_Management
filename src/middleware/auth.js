@@ -1,5 +1,6 @@
 const jwt = require("jsonwebtoken");
 const userModels = require("../models/userModels");
+const mongoose = require("mongoose")
 
 
 const authentication = async function (req, res, next) {
@@ -12,7 +13,7 @@ const authentication = async function (req, res, next) {
         let Bearer = token.split(' ');
 
         let decodedToken = jwt.verify(Bearer[1], "functionupiswaywaycoolproject5group9")
-        // req.decodedToken = decodedToken.userId;
+        req.decodedToken = decodedToken.userId;
         console.log(decodedToken);
 
         next();
@@ -32,20 +33,20 @@ const authentication = async function (req, res, next) {
 
 const authorization = async function (req, res, next) {
     try {
-        const decodedToken = req.decodedToken
-        const userId = req.params.userId
-
+        let decodedToken = req.decodedToken
+        let userId = req.params.userId
 
         if (!userId) {
             return res.status(400).send({ status: false, message: " userId is required" })
         }
-        // const userData = await userModels.findOne({ _id: userId})
-        // if(!userData){ return res.status(404).send({status: false, message: " userId is not found"})}
+        if (!mongoose.isValidObjectId(userId)) return res.status(400).send({ status: false, message: "please enter a correct userId" })
+        const userData = await userModels.findOne({ _id: userId})
+        if(!userData){ return res.status(404).send({status: false, message: " userId is not found"})}
 
-        if (decodedToken.userId !== userId) {
+        if (decodedToken != userId) {
             console.log(decodedToken);
             console.log(userId);
-            return res.status(403).send({ status: false, message: "unauthorized access" })
+            return res.status(403).send({ status: false, message: "Your are not Authorization" })
         }
         else {
             next()

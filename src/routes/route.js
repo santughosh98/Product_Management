@@ -1,7 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const { createUser, login, getUserDetails, updateduser } = require("../controllers/userControllers")
-const {authentication, authorization} = require("../middleware/auth")
+const { authentication, authorization } = require("../middleware/auth")
+const { createProduct, getProductsById } = require("../controllers/productController")
 
 
 
@@ -13,10 +14,19 @@ router.post("/register", createUser)
 router.post("/login", login)
 
 //get details
-router.get("/user/:userId/profile", authentication, getUserDetails)
+router.get("/user/:userId/profile", authentication, authorization, getUserDetails)
 
 //update
 router.put("/user/:userId/profile", authentication, authorization, updateduser)
+
+
+/*------------------------------------------------Product---------------------------------------------------------------*/
+
+//create product
+router.post("/products", createProduct)
+
+// get details
+router.get("/products/:productId", getProductsById)
 
 
 
