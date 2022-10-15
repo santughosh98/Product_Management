@@ -5,7 +5,7 @@ const bcrypt = require("bcrypt")
 const mongoose = require("mongoose")
 
 
-const { isValidMail, isValid, isValidName, isValidRequestBody, isValidfild, isValidMobile, isValidPassword } = require("../validator/validation")
+const { isValidMail, isValid, isValidName, isValidRequestBody, isValidfild, isValidMobile, isValidPassword, isEmpty } = require("../validator/validation")
 
 
 
@@ -59,7 +59,7 @@ const createUser = async function (req, res) {
 
                 if (!isValid(address.shipping.city)) { return res.status(400).send({ status: false, message: "please enter your shipping city" }) }
 
-                if (!isValid(address.shipping.pincode)) { return res.status(400).send({ status: false, message: "please enter your shipping pincode" }) }
+                if (!isEmpty(address.shipping.pincode)) { return res.status(400).send({ status: false, message: "please enter your shipping pincode" }) }
 
                 if (address.shipping.pincode) {
 
@@ -77,7 +77,7 @@ const createUser = async function (req, res) {
 
                 if (!isValid(address.billing.city)) { return res.status(400).send({ status: false, message: "please enter your billing city" }) }
 
-                if (!isValid(address.billing.pincode)) { return res.status(400).send({ status: false, message: "please enter your shipping pincode" }) }
+                if (!isEmpty(address.billing.pincode)) { return res.status(400).send({ status: false, message: "please enter your billing pincode" }) }
 
                 if (address.billing.pincode) {
 
@@ -208,7 +208,7 @@ const updateduser = async function (req, res) {
         }
 
 
-        if (phone) {
+        if (typeof phone === "string") {
             if (!isValid(phone)) { return res.status(400).send({ status: false, message: "phone is required for update" }) }
             if (!isValidMobile.test(phone)) { return res.status(400).send({ status: false, message: "please enter phone in valid format" }) }
             let duplicatePhone = await userModel.findOne({ phone })
@@ -239,7 +239,7 @@ const updateduser = async function (req, res) {
 
                 if (!isValid(address.shipping.city)) { return res.status(400).send({ status: false, message: "please enter your shipping city for update" }) }
 
-                if (!isValid(address.shipping.pincode)) { return res.status(400).send({ status: false, message: "please enter your shipping pincode for update" }) }
+                if (!isEmpty(address.shipping.pincode)) { return res.status(400).send({ status: false, message: "please enter your shipping pincode for update" }) }
 
                 if (address.shipping.pincode) {
 
@@ -259,7 +259,7 @@ const updateduser = async function (req, res) {
 
                 if (!isValid(address.billing.city)) { return res.status(400).send({ status: false, message: "please enter your billing city for update" }) }
 
-                if (!isValid(address.billing.pincode)) { return res.status(400).send({ status: false, message: "please enter your shipping pincode for update" }) }
+                if (!isEmpty(address.billing.pincode)) { return res.status(400).send({ status: false, message: "please enter your shipping pincode for update" }) }
 
                 if (address.billing.pincode) {
 
