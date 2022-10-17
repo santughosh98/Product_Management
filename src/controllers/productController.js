@@ -298,7 +298,7 @@ const deleteProduct = async function (req, res) {
         let savedata = await productModel.findOneAndUpdate({ _id: productId }, { $set: { isDeleted: true, deletedAt: Date.now() } })
         return res.status(200).send({ status: true, message: "product data delete successfully" })
     } catch (err) {
-        return res.status(500).send({ status: true, message: err.message })
+        return res.status(500).send({ status: false, message: err.message })
     }
 }
 
