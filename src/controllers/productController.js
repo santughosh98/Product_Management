@@ -39,7 +39,6 @@ const createProduct = async function (req, res) {
 
         //validation for description{
         if (!isValid(description)) { return res.status(400).send({ status: false, message: "description is required" }) }
-        if (!isValidName.test(description)) { return res.status(400).send({ status: false, message: "please enter descriptionin in correct format" }) }
 
         //validation for price
         if (!isValid(price)) { return res.status(400).send({ status: false, message: "price is required" }) }
@@ -100,9 +99,9 @@ const getProduct = async function (req, res) {
         const { size, name, priceGreaterThan, priceLessThan, priceSort } = data
 
         if (!isValidRequestBody(data)) {
-            const product = await productModel.find(filter)
+            const products = await productModel.find(filter)
             if (product.length === 0) { return res.status(404).send({ status: false, message: " product is not found" }) }
-            return res.status(200).send({ status: true, message: "Success", data: product })
+            return res.status(200).send({ status: true, message: "Success", data: products })
         }
 
         if (isValidRequestBody(data)) {
@@ -118,7 +117,7 @@ const getProduct = async function (req, res) {
                 if (name) {
                     if (!isValid(name)) { return res.status(400).send({ status: false, message: " product name is not valid" }) }
                     const titleName = name.replace(/\s{2, }/g, ' ').trim()
-                    filter["title"] = { $regex: titleName, $options: "i" }
+                    filter["title"] = { $regex: titleName, $options: "i" } /// doubt
                 }
             }
             if (priceGreaterThan || priceGreaterThan === "") {
@@ -146,7 +145,7 @@ const getProduct = async function (req, res) {
 
         let product = await productModel.find(filter).sort({ price: priceSort })
         if (product.length === 0) { return res.status(404).send({ status: false, message: " product not found" }) }
-        return res.status(200).send({ status: true, message: " success", data: product })
+        return res.status(200).send({ status: true, message: " Success", data: product })
 
     } catch (error) {
         return res.status(500).send({ status: false, message: error.message });
@@ -213,7 +212,6 @@ const updateProduct = async function (req, res) {
 
         if (description || description === "") {
             if (!isValid(description)) { return res.status(400).send({ status: false, message: "description is required for update" }) }
-            if (!isValidName.test(description)) { return res.status(400).send({ status: false, message: "please enter descriptionin correct format" }) }
         }
 
 

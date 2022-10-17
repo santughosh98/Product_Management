@@ -49,7 +49,6 @@ const isValidPassword = function (value) {
 
 
 
-
 module.exports = {
     isValidMail, isValid, isValidName, isEmpty, isValidPrice, isValidRequestBody, isValidfild, isValidMobile, isValidPassword, priceValid, strRegex
 }

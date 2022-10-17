@@ -43,7 +43,7 @@ const createUser = async function (req, res) {
         if (duplicatePhone) { return res.status(404).send({ status: false, message: `${phone} phone no is aleardy registered` }) }
 
         if (!isValid(password)) { return res.status(400).send({ status: false, message: "password is required" }) }
-        if (!isValidPassword(password)) return res.status(406).send({ status: false, message: "enter valid password  ", ValidPassWord: "passWord in between(8-15)& must be contain ==> upperCase,lowerCase,specialCharecter & Number" })
+        if (!isValidPassword(password)) return res.status(406).send({ status: false, message: "enter valid password  " })
 
         if (typeof address === "string") {
             if (!isValid(address)) { return res.status(400).send({ status: false, message: "address is required" }) }
@@ -116,7 +116,7 @@ const login = async function (req, res) {
         if (!isValidMail.test(email)) { return res.status(400).send({ status: false, message: "please enter email in valid format" }) }
 
         if (!isValid(password)) { return res.status(400).send({ status: false, message: "password is required" }) }
-        if (!isValidPassword(password)) return res.status(400).send({ status: false, message: "enter valid password  ", ValidPassWord: "passWord in between(8-15)& must be contain ==> upperCase,lowerCase,specialCharecter & Number" })
+        if (!isValidPassword(password)) return res.status(400).send({ status: false, message: "enter valid password  "})
 
 
         const loginUser = await userModel.findOne({ email: email })
@@ -128,7 +128,7 @@ const login = async function (req, res) {
         //request body password and bcrypt hash password not match
         if (!passwordCheck) return res.status(400).send({ status: false, message: "password is not correct!" })
 
-        let token = await jwt.sign({ userId: loginUser._id.toString() }, "functionupiswaywaycoolproject5group9", { expiresIn: '2hr' })
+        let token = await jwt.sign({ userId: loginUser._id.toString() }, "functionupiswaywaycoolproject5group9", { expiresIn: '5hr' })
         res.header({ "x-api-key": token })
         return res.status(201).send({ status: true, message: "login Successful", data: { token: token, userId: loginUser._id } })
     } catch (err) {
