@@ -14,7 +14,6 @@ const authentication = async function (req, res, next) {
 
         let decodedToken = jwt.verify(Bearer[1], "functionupiswaywaycoolproject5group9")
         req.decodedToken = decodedToken.userId;
-        console.log(decodedToken);
 
         next();
 
@@ -44,8 +43,6 @@ const authorization = async function (req, res, next) {
         if(!userData){ return res.status(404).send({status: false, message: " userId is not found"})}
 
         if (decodedToken != userId) {
-            console.log(decodedToken);
-            console.log(userId);
             return res.status(403).send({ status: false, message: "Your are not Authorization" })
         }
         else {

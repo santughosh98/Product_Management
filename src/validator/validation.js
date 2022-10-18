@@ -48,7 +48,14 @@ const isValidPassword = function (value) {
 };
 
 
+//Validation for Quantity
+const validQuantity = function isInteger(value) {
+    if (value < 1) return false
+    if (value % 1 == 0) return true
+  }
+
+
 
 module.exports = {
-    isValidMail, isValid, isValidName, isEmpty, isValidPrice, isValidRequestBody, isValidfild, isValidMobile, isValidPassword, priceValid, strRegex
+    isValidMail, isValid, isValidName, isEmpty, isValidPrice, isValidRequestBody, isValidfild, isValidMobile, isValidPassword, priceValid, strRegex, validQuantity
 }
