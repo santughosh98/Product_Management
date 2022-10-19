@@ -4,7 +4,7 @@ const { createUser, login, getUserDetails, updateduser } = require("../controlle
 const { authentication, authorization } = require("../middleware/auth")
 const { createProduct, getProduct, getProductsById, updateProduct, deleteProduct } = require("../controllers/productController")
 const { createCart, updateCart, getCartDetails, deleteCart } = require("../controllers/cartController")
-
+const { createOrder, updateOrder } = require("../controllers/orderController")
 
 
 /*----------------------------------------------------User--------------------------------------------------------------*/
@@ -52,6 +52,20 @@ router.get("/users/:userId/cart", authentication, authorization, getCartDetails)
 
 // cartDelete
 router.delete("/users/:userId/cart", authentication, authorization, deleteCart)
+
+
+
+
+
+/*------------------------------------------------Order---------------------------------------------------------------*/
+
+//create Order
+router.post("/users/:userId/orders", authentication, authorization, createOrder)
+
+// update Order
+router.put("/users/:userId/orders", authentication, authorization, updateOrder)
+
+
 
 
 
