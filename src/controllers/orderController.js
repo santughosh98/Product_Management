@@ -30,14 +30,15 @@ const createOrder = async function (req, res) {
 
         if (!mongoose.isValidObjectId(cartId)) { return res.status(400).send({ status: false, message: "cart Id in not valid" }) }
 
-        let userCart = await cartModel.findOne({ _id: cartId, userId, }).select({ items: 1, totalPrice: 1, totalItems: 1 })
+        let cartData = await cartModel.findOne({ _id: cartId, userId, }).select({ items: 1, totalPrice: 1, totalItems: 1 })
 
-        if (!userCart) { return res.status(404).send({ status: false, message: "cart not found" }) }
+        if (!cartData) { return res.status(404).send({ status: false, message: "cart not found" }) }
 
 
         totalQuantity = 0;
-        for (let i = 0; i < userCart.items.length; i++) {
-            totalQuantity += userCart.items[i].quantity
+        for (let i = 0; i < cartData.items.length; i++) {
+            totalQuantity += cartData.items[i].quantity
+            console.log(totalQuantity);
         }
 
         if (cancellable) {
@@ -54,9 +55,9 @@ const createOrder = async function (req, res) {
 
         const orderDetails = {
             userId: userId,
-            items: userCart.items,
-            totalPrice: userCart.totalPrice,
-            totalItems: userCart.totalItems,
+            items: cartData.items,
+            totalPrice: cartData.totalPrice,
+            totalItems: cartData.totalItems,
             totalQuantity: totalQuantity,
             cancellable: cancellable
         }
@@ -108,13 +109,23 @@ const updateOrder = async function (req, res) {
         if (orderCheck.cancellable == false) {
             return res.status(400).send({ status: false, message: "your order is already canceld" })
         }
+        let deletion = await cartModel.findOneAndUpdate({ userId },
+            {
+                $set:
+                {
+                    items: [],
+                    totalPrice: 0,
+                    totalItems: 0
+                }
+            },
+            { new: true })
 
         res.status(200).send({
-            status: true, message: "success", data: orderCheck
+            status: true, message: "success", data: deletion
         })
-
-    } catch (error) {
-        return res.status(500).send({ status: false, message: error.message });
+    }
+    catch(error){
+        return res.status(500).json({ status: false, message: error.message });
     }
 }
 
@@ -123,3 +134,265 @@ const updateOrder = async function (req, res) {
 
 
 module.exports = { createOrder, updateOrder }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

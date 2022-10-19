@@ -100,7 +100,7 @@ const getProduct = async function (req, res) {
 
         if (!isValidRequestBody(data)) {
             const products = await productModel.find(filter)
-            if (product.length === 0) { return res.status(404).send({ status: false, message: " product is not found" }) }
+            if (products.length === 0) { return res.status(404).send({ status: false, message: " product is not found" }) }
             return res.status(200).send({ status: true, message: "Success", data: products })
         }
 
