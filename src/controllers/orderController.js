@@ -7,7 +7,7 @@ const mongoose = require("mongoose")
 
 
 
-const { isValid, isValidName, strRegex, isValidRequestBody, isValidfild, isValidPrice, isValidMobile, priceValid, isEmpty, validQuantity } = require("../validator/validation")
+const { isValid, isValidRequestBody } = require("../validator/validation")
 
 
 
@@ -30,7 +30,7 @@ const createOrder = async function (req, res) {
 
         if (!mongoose.isValidObjectId(cartId)) { return res.status(400).send({ status: false, message: "cart Id in not valid" }) }
 
-        let cartData = await cartModel.findOne({ _id: cartId, userId, }).select({ items: 1, totalPrice: 1, totalItems: 1 })
+        let cartData = await cartModel.findOne({ _id: cartId, userId: userId, }).select({ items: 1, totalPrice: 1, totalItems: 1 })
 
         if (!cartData) { return res.status(404).send({ status: false, message: "cart not found" }) }
 
@@ -38,7 +38,6 @@ const createOrder = async function (req, res) {
         totalQuantity = 0;
         for (let i = 0; i < cartData.items.length; i++) {
             totalQuantity += cartData.items[i].quantity
-            console.log(totalQuantity);
         }
 
         if (cancellable) {
@@ -79,7 +78,6 @@ const updateOrder = async function (req, res) {
         let data = req.body
 
         const { orderId, status } = data
-        console.log(orderId);
 
         if (!isValidRequestBody(data)) {
             return res.status(400).send({ status: false, message: "plese enter data in request body" })
@@ -121,10 +119,10 @@ const updateOrder = async function (req, res) {
             { new: true })
 
         res.status(200).send({
-            status: true, message: "success", data: deletion
+            status: true, message: "success", data: orderCheck
         })
     }
-    catch(error){
+    catch (error) {
         return res.status(500).json({ status: false, message: error.message });
     }
 }
@@ -134,265 +132,3 @@ const updateOrder = async function (req, res) {
 
 
 module.exports = { createOrder, updateOrder }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

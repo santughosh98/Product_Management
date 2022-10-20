@@ -4,7 +4,7 @@ const mongoose = require("mongoose")
 
 
 
-const { isValid, isValidName, strRegex, isValidRequestBody, isValidfild, isValidPrice, isValidMobile, priceValid } = require("../validator/validation")
+const { isValid, isValidName, strRegex, isValidRequestBody, isValidPrice } = require("../validator/validation")
 
 
 

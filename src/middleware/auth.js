@@ -39,8 +39,8 @@ const authorization = async function (req, res, next) {
             return res.status(400).send({ status: false, message: " userId is required" })
         }
         if (!mongoose.isValidObjectId(userId)) return res.status(400).send({ status: false, message: "please enter a correct userId" })
-        const userData = await userModels.findOne({ _id: userId})
-        if(!userData){ return res.status(404).send({status: false, message: " userId is not found"})}
+        const userData = await userModels.findOne({ _id: userId })
+        if (!userData) { return res.status(404).send({ status: false, message: " userId is not found" }) }
 
         if (decodedToken != userId) {
             return res.status(403).send({ status: false, message: "Your are not Authorization" })

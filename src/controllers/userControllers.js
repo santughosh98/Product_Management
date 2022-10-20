@@ -5,7 +5,7 @@ const bcrypt = require("bcrypt")
 const mongoose = require("mongoose")
 
 
-const { isValidMail, isValid, isValidName, isValidRequestBody, isValidfild, isValidMobile, isValidPassword, isEmpty } = require("../validator/validation")
+const { isValidMail, isValid, isValidName, isValidRequestBody, isValidMobile, isValidPassword, isEmpty } = require("../validator/validation")
 
 
 
@@ -116,7 +116,7 @@ const login = async function (req, res) {
         if (!isValidMail.test(email)) { return res.status(400).send({ status: false, message: "please enter email in valid format" }) }
 
         if (!isValid(password)) { return res.status(400).send({ status: false, message: "password is required" }) }
-        if (!isValidPassword(password)) return res.status(400).send({ status: false, message: "enter valid password  "})
+        if (!isValidPassword(password)) return res.status(400).send({ status: false, message: "enter valid password  " })
 
 
         const loginUser = await userModel.findOne({ email: email })
