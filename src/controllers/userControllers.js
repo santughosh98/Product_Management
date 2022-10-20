@@ -130,7 +130,7 @@ const login = async function (req, res) {
 
         let token = await jwt.sign({ userId: loginUser._id.toString() }, "functionupiswaywaycoolproject5group9", { expiresIn: '5hr' })
         res.header({ "x-api-key": token })
-        return res.status(201).send({ status: true, message: "login Successful", data: { token: token, userId: loginUser._id } })
+        return res.status(201).send({ status: true, message: "Sucess", data: { token: token, userId: loginUser._id } })
     } catch (err) {
         return res.status(500).send({ status: false, message: err.message });
     }
@@ -150,7 +150,7 @@ const getUserDetails = async function (req, res) {
         let findUserId = await userModel.findOne({ _id: userId })
         if (!findUserId) { return res.status(404).send({ status: false, message: "user details is not found" }) }
 
-        res.status(200).send({ status: true, message: "User profile details", data: findUserId })
+        res.status(200).send({ status: true, message: "Sucess", data: findUserId })
 
     } catch (error) {
         return res.status(500).send({ status: false, message: error.message });
@@ -283,7 +283,7 @@ const updateduser = async function (req, res) {
             },
         }, { new: true })
 
-        return res.status(200).send({ status: true, message: "User profile updated sucessfully", data: updateduser })
+        return res.status(200).send({ status: true, message: "Sucess", data: updateduser })
 
     } catch (error) {
         return res.status(500).send({ status: false, message: error.message });
