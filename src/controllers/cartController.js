@@ -73,7 +73,7 @@ const createCart = async function (req, res) {
                     cart.totalPrice = totalPrice
 
                     cart.save()
-                    return res.status(200).send({ status: true, message: "Success", data: cart })
+                    return res.status(201).send({ status: true, message: "Success", data: cart })
                 }
             }
             let sum = 0
@@ -87,7 +87,7 @@ const createCart = async function (req, res) {
             let obj = { totalPrice: totalPrice, totalItems: sum, userId: userId, items: items }
             let updatedData = await cartModel.findOneAndUpdate({ _id: cartId }, obj, { new: true })
 
-            res.status(200).send({ status: true, message: "Success", data: updatedData })
+            res.status(201).send({ status: true, message: "Success", data: updatedData })
         }
 
     } catch (err) {
